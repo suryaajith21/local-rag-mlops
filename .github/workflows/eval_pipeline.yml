@@ -1,0 +1,48 @@
+name: RAG Evaluation Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  evaluate-rag:
+    runs-on: self-hosted  # <--- This tells GitHub to use YOUR laptop
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      # We assume your laptop already has the environment, 
+      # but in a real CI, we'd install fresh. 
+      # For this hybrid setup, we'll just ensure packages are there.
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run RAG Evaluation
+      # We fail the build if Faithfulness is < 0.70 (Quality Gate)
+      run: |
+        echo "Running Evaluation Script..."
+        python eval.py
+        
+    - name: Check Quality Gate
+      # This is a simple python script embedded in YAML to check the CSV results
+      run: |
+        python -c "
+        import pandas as pd; 
+        df = pd.read_csv('evaluation_results.csv'); 
+        faith = df['faithfulness'].mean(); 
+        rel = df['answer_relevancy'].mean(); 
+        print(f'Faithfulness: {faith}, Relevancy: {rel}'); 
+        assert faith >= 0.70, 'FAIL: Faithfulness score is too low!';
+        assert rel >= 0.70, 'FAIL: Relevancy score is too low!';
+        print('SUCCESS: Quality Gate Passed!')
+        "
