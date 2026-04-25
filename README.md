@@ -3,6 +3,7 @@
 A self-hosted, privacy-first Retrieval-Augmented Generation system
 built as an upgrade over the original RAG pipeline. All inference runs
 locally.
+locally.
 
 ## Architecture
 
@@ -104,6 +105,7 @@ that dense retrieval missed entirely on entity-centric queries like
 
 **Why a CrossEncoder reranker?** Bi-encoders embed query and document
 independently. CrossEncoders see the full (query, document) pair and
+score relevance jointly. It is more accurate but too slow to
 score relevance jointly. It is more accurate but too slow to
 run on all chunks. The two-stage pipeline (fast retrieval + accurate
 reranking) is the production standard.
@@ -266,6 +268,11 @@ mlops-rag-pipeline/
 
 | Document | Domain | Pages |
 |---|---|---|
+| genai_review.pdf | Generative AI survey (manuscript under review) | 109 |
+| [1706.03762v7.pdf](https://arxiv.org/abs/1706.03762) | Transformer / Attention | ~15 |
+| [2603.03329v1.pdf](https://arxiv.org/abs/2603.03329) | AutoHarness / LLM agents | ~10 |
+| [2602.02276v1.pdf](https://arxiv.org/abs/2602.02276) | Kimi K2.5 / Multimodal agents | ~20 |
+
 | genai_review.pdf | Generative AI survey (manuscript under review) | 109 |
 | [1706.03762v7.pdf](https://arxiv.org/abs/1706.03762) | Transformer / Attention | ~15 |
 | [2603.03329v1.pdf](https://arxiv.org/abs/2603.03329) | AutoHarness / LLM agents | ~10 |

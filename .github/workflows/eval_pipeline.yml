@@ -19,14 +19,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install / sync dependencies
-        shell: bash
         run: |
-          conda run -n $CONDA_ENV python -m pip install -r requirements.txt -q
+          conda run -n %CONDA_ENV% python -m pip install -r requirements.txt -q
 
       - name: Run ingestion pipeline (all PDFs in data/)
-        shell: bash
         run: |
-          conda run -n $CONDA_ENV python -c "
+          conda run -n %CONDA_ENV% python -c "
           import asyncio
           from src.ingestion.pipeline import run_ingestion_pipeline
           summary = asyncio.run(run_ingestion_pipeline(clear_existing=True))
@@ -34,30 +32,19 @@ jobs:
           for k, v in summary.items():
               print(f'  {k}: {v}')
           files = summary.get('files_processed', 0)
-          assert files > 0, f'No files ingested — check data/ directory'
+          assert files > 0, f'No files ingested - check data/ directory'
           "
 
       - name: Start FastAPI server
-        shell: bash
         run: |
-          conda run -n $CONDA_ENV uvicorn src.api.server:app \
-            --host 0.0.0.0 --port 8000 &
-          # Wait for server to be ready (up to 60 s)
-          for i in $(seq 1 30); do
-            if conda run -n $CONDA_ENV python -c \
-              "import httpx; httpx.get('$SERVER_URL/health').raise_for_status()" 2>/dev/null; then
-              echo "Server ready after ${i}s"
-              break
-            fi
-            sleep 2
-          done
+          start /B conda run -n %CONDA_ENV% uvicorn src.api.server:app --host 0.0.0.0 --port 8000
+          timeout /T 20 /NOBREAK
 
       - name: Verify server health
-        shell: bash
         run: |
-          conda run -n $CONDA_ENV python -c "
+          conda run -n %CONDA_ENV% python -c "
           import httpx, json
-          r = httpx.get('$SERVER_URL/health')
+          r = httpx.get('http://localhost:8000/health')
           r.raise_for_status()
           data = r.json()
           print('Health:', json.dumps(data, indent=2))
@@ -66,22 +53,20 @@ jobs:
           "
 
       - name: Run evaluation (eval_v2.py)
-        shell: bash
         run: |
-          conda run -n $CONDA_ENV python evaluation/eval_v2.py \
-            --server $SERVER_URL
+          conda run -n %CONDA_ENV% python evaluation/eval_v2.py --server %SERVER_URL%
 
       - name: Stop FastAPI server
         if: always()
-        shell: pwsh
+        shell: powershell
         run: |
-          $pid_line = netstat -ano | Select-String ":8000.*LISTENING"
-          if ($pid_line) {
-            $server_pid = ($pid_line -split '\s+')[-1]
+          $result = netstat -ano | Select-String ":8000\s.*LISTENING"
+          if ($result) {
+            $server_pid = ($result.ToString().Trim() -split '\s+')[-1]
             taskkill /F /PID $server_pid
             Write-Host "Killed PID $server_pid"
           } else {
-            Write-Host "No process found on port 8000"
+            Write-Host "No process on port 8000, nothing to kill"
           }
 
       - name: Upload evaluation artifacts
