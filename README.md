@@ -273,10 +273,6 @@ mlops-rag-pipeline/
 | [2603.03329v1.pdf](https://arxiv.org/abs/2603.03329) | AutoHarness / LLM agents | ~10 |
 | [2602.02276v1.pdf](https://arxiv.org/abs/2602.02276) | Kimi K2.5 / Multimodal agents | ~20 |
 
-| genai_review.pdf | Generative AI survey (manuscript under review) | 109 |
-| [1706.03762v7.pdf](https://arxiv.org/abs/1706.03762) | Transformer / Attention | ~15 |
-| [2603.03329v1.pdf](https://arxiv.org/abs/2603.03329) | AutoHarness / LLM agents | ~10 |
-| [2602.02276v1.pdf](https://arxiv.org/abs/2602.02276) | Kimi K2.5 / Multimodal agents | ~20 |
 
 
 ## Known Limitations
