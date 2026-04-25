@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-04-25T01:33:55Z",
+  "server": "http://localhost:8000",
+  "questions_evaluated": 20,
+  "query_time_seconds": 286.2,
+  "eval_time_seconds": 221.9,
+  "overall_scores": {
+    "faithfulness": 0.9386,
+    "answer_relevancy": 0.347,
+    "context_precision": 0.8,
+    "context_recall": 0.87
+  },
+  "answer_relevancy_non_adversarial": 0.4626,
+  "per_category_scores": {
+    "ADVERSARIAL": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.0,
+      "context_precision": 0.8,
+      "context_recall": 0.9
+    },
+    "DIRECT": {
+      "faithfulness": 0.9583,
+      "answer_relevancy": 0.7073,
+      "context_precision": 1.0,
+      "context_recall": 0.9
+    },
+    "ENTITY": {
+      "faithfulness": 0.9,
+      "answer_relevancy": 0.136,
+      "context_precision": 0.4,
+      "context_recall": 0.72
+    },
+    "MULTIHOP": {
+      "faithfulness": 0.9,
+      "answer_relevancy": 0.5446,
+      "context_precision": 1.0,
+      "context_recall": 0.96
+    }
+  },
+  "quality_gates": {
+    "faithfulness": {
+      "score": 0.9386,
+      "threshold": 0.75,
+      "passed": true
+    },
+    "answer_relevancy": {
+      "score": 0.4626,
+      "threshold": 0.75,
+      "passed": false
+    },
+    "context_precision": {
+      "score": 0.8,
+      "threshold": 0.65,
+      "passed": true
+    },
+    "context_recall": {
+      "score": 0.87,
+      "threshold": 0.55,
+      "passed": true
+    }
+  },
+  "all_gates_passed": false,
+  "judge_llm": "mistral (ollama)",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2"
+}

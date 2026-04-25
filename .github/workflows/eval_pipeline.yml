@@ -1,48 +1,94 @@
-name: RAG Evaluation Pipeline
+name: RAG Evaluation Pipeline v2
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   evaluate-rag:
-    runs-on: self-hosted  # <--- This tells GitHub to use YOUR laptop
-    
+    runs-on: self-hosted
+
+    env:
+      CONDA_ENV: rag-ops
+      SERVER_URL: http://localhost:8000
+
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        cache: 'pip'
+      - name: Install / sync dependencies
+        run: |
+          conda run -n $CONDA_ENV pip install -r requirements.txt -q
 
-    - name: Install Dependencies
-      # We assume your laptop already has the environment, 
-      # but in a real CI, we'd install fresh. 
-      # For this hybrid setup, we'll just ensure packages are there.
-      run: |
-        pip install -r requirements.txt
+      - name: Run ingestion pipeline (all PDFs in data/)
+        run: |
+          conda run -n $CONDA_ENV python -c "
+          import asyncio
+          from src.ingestion.pipeline import run_ingestion_pipeline
+          summary = asyncio.run(run_ingestion_pipeline(clear_existing=True))
+          print('Ingestion summary:')
+          for k, v in summary.items():
+              print(f'  {k}: {v}')
+          files = summary.get('files_processed', 0)
+          assert files > 0, f'No files ingested — check data/ directory'
+          "
 
-    - name: Run RAG Evaluation
-      # We fail the build if Faithfulness is < 0.70 (Quality Gate)
-      run: |
-        echo "Running Evaluation Script..."
-        python eval.py
-        
-    - name: Check Quality Gate
-      # This is a simple python script embedded in YAML to check the CSV results
-      run: |
-        python -c "
-        import pandas as pd; 
-        df = pd.read_csv('evaluation_results.csv'); 
-        faith = df['faithfulness'].mean(); 
-        rel = df['answer_relevancy'].mean(); 
-        print(f'Faithfulness: {faith}, Relevancy: {rel}'); 
-        assert faith >= 0.70, 'FAIL: Faithfulness score is too low!';
-        assert rel >= 0.70, 'FAIL: Relevancy score is too low!';
-        print('SUCCESS: Quality Gate Passed!')
-        "
+      - name: Start FastAPI server
+        run: |
+          conda run -n $CONDA_ENV uvicorn src.api.server:app \
+            --host 0.0.0.0 --port 8000 &
+          # Wait for server to be ready (up to 60 s)
+          for i in $(seq 1 30); do
+            if conda run -n $CONDA_ENV python -c \
+              "import httpx; httpx.get('$SERVER_URL/health').raise_for_status()" 2>/dev/null; then
+              echo "Server ready after ${i}s"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Verify server health
+        run: |
+          conda run -n $CONDA_ENV python -c "
+          import httpx, json
+          r = httpx.get('$SERVER_URL/health')
+          r.raise_for_status()
+          data = r.json()
+          print('Health:', json.dumps(data, indent=2))
+          assert data['status'] == 'ok', 'Server unhealthy'
+          assert data['vector_chunks'] > 0, 'Vector store is empty after ingestion'
+          "
+
+      - name: Run evaluation (eval_v2.py)
+        run: |
+          conda run -n $CONDA_ENV python evaluation/eval_v2.py \
+            --server $SERVER_URL
+
+      - name: Stop FastAPI server
+        if: always()
+        run: |
+          conda run -n $CONDA_ENV python -c "
+          import subprocess, sys
+          result = subprocess.run(
+              ['netstat', '-ano'],
+              capture_output=True, text=True
+          )
+          for line in result.stdout.splitlines():
+              if ':8000 ' in line and 'LISTENING' in line:
+                  pid = line.strip().split()[-1]
+                  print(f'Killing PID {pid}')
+                  subprocess.run(['taskkill', '/F', '/PID', pid])
+                  break
+          " || true
+
+      - name: Upload evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-v2-${{ github.run_number }}
+          path: |
+            evaluation/v2/evaluation_results_v2.csv
+            evaluation/v2/summary.json
+          if-no-files-found: warn

@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.pyc
+
+# Environments
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vector DB and model artifacts
+vector_db/
+*.pkl
+*.sqlite3
+*.faiss
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# GitHub Actions runner
+actions-runner/
+
+
+# PDFS
+data/*.pdf
+
+
+# debug report
+report.md
