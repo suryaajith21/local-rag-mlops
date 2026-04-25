@@ -2,7 +2,7 @@
 [Updated: 4/25/2026]
 A self-hosted, privacy-first Retrieval-Augmented Generation system
 built as an upgrade over the original RAG pipeline. All inference runs
-locally — no external API calls, no data leaves your machine.
+locally.
 
 ## Architecture
 
@@ -68,20 +68,32 @@ PDF Documents
 Evaluated on 20 questions across 4 categories (DIRECT, ENTITY,
 MULTIHOP, ADVERSARIAL) using Mistral-7B as independent judge.
 
-| Metric | V1 | V2 | Notes |
-|---|---|---|---|
-| Faithfulness | 0.89* | 0.94 | *V1 used self-grading (inflated) |
-| Answer Relevancy | 0.86* | 0.46 | *V1 self-graded; excludes correct refusals |
-| Context Precision | not measured | 0.80 | Not measured in V1 |
-| Context Recall | not measured | 0.87 | Not measured in V1 |
+| Metric | Score | Non-adversarial | Gate | Status |
+|---|---|---|---|---|
+| Faithfulness | 0.9092 | — | >= 0.75 | PASS |
+| Answer Relevancy | 0.6341 | 0.7045 | >= 0.75 | FAIL* |
+| Context Precision | 0.8500 | — | >= 0.65 | PASS |
+| Context Recall | 0.7375 | — | >= 0.55 | PASS |
 
 Answer relevancy is suppressed by the ADVERSARIAL category where
 correct refusals ("The document does not contain sufficient information")
-score 0.0 under Ragas' metric design. The system is behaving correctly.
+score 0.0 under Ragas' metric design. Non-adversarial score is 0.70.
 
 V1 faithfulness and answer_relevancy were measured with llama3.2
 grading its own outputs, introducing self-consistency bias. V2 uses
 an independent Mistral-7B judge for all metrics.
+
+| Category | n | Faithfulness | Answer Relevancy | Context Precision | Context Recall |
+|---|---|---|---|---|---|
+| DIRECT | 10 | 0.9433 | 0.7794 | 0.9000 | 0.8167 |
+| ENTITY | 4 | 0.9375 | 0.8356 | 0.7500 | 0.7708 |
+| MULTIHOP | 4 | 0.7500 | 0.3864 | 0.7500 | 0.3750 |
+| ADVERSARIAL | 2 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+
+MULTIHOP weakness is a known architectural constraint: questions requiring
+simultaneous retrieval from two documents compete for k_final=5 slots,
+limiting cross-document coverage after reranking.
+
 
 ## Key Design Decisions
 
@@ -92,7 +104,7 @@ that dense retrieval missed entirely on entity-centric queries like
 
 **Why a CrossEncoder reranker?** Bi-encoders embed query and document
 independently. CrossEncoders see the full (query, document) pair and
-score relevance jointly — significantly more accurate but too slow to
+score relevance jointly. It is more accurate but too slow to
 run on all chunks. The two-stage pipeline (fast retrieval + accurate
 reranking) is the production standard.
 
@@ -254,10 +266,11 @@ mlops-rag-pipeline/
 
 | Document | Domain | Pages |
 |---|---|---|
-| genai_review.pdf | Generative AI survey | 109 |
-| 1706.03762v7.pdf | Transformer / Attention | ~15 |
-| 2603.03329v1.pdf | AutoHarness / LLM agents | ~10 |
-| 2602.02276v1.pdf | Kimi K2.5 / Multimodal agents | ~20 |
+| genai_review.pdf | Generative AI survey (manuscript under review) | 109 |
+| [1706.03762v7.pdf](https://arxiv.org/abs/1706.03762) | Transformer / Attention | ~15 |
+| [2603.03329v1.pdf](https://arxiv.org/abs/2603.03329) | AutoHarness / LLM agents | ~10 |
+| [2602.02276v1.pdf](https://arxiv.org/abs/2602.02276) | Kimi K2.5 / Multimodal agents | ~20 |
+
 
 ## Known Limitations
 

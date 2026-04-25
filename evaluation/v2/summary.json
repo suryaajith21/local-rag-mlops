@@ -1,60 +1,60 @@
 {
-  "timestamp": "2026-04-25T01:33:55Z",
+  "timestamp": "2026-04-25T17:03:52Z",
   "server": "http://localhost:8000",
   "questions_evaluated": 20,
-  "query_time_seconds": 286.2,
-  "eval_time_seconds": 221.9,
+  "query_time_seconds": 305.3,
+  "eval_time_seconds": 231.7,
   "overall_scores": {
-    "faithfulness": 0.9386,
-    "answer_relevancy": 0.347,
-    "context_precision": 0.8,
-    "context_recall": 0.87
+    "faithfulness": 0.9092,
+    "answer_relevancy": 0.6341,
+    "context_precision": 0.85,
+    "context_recall": 0.7375
   },
-  "answer_relevancy_non_adversarial": 0.4626,
+  "answer_relevancy_non_adversarial": 0.7045,
   "per_category_scores": {
     "ADVERSARIAL": {
       "faithfulness": 1.0,
       "answer_relevancy": 0.0,
-      "context_precision": 0.8,
-      "context_recall": 0.9
+      "context_precision": 1.0,
+      "context_recall": 1.0
     },
     "DIRECT": {
-      "faithfulness": 0.9583,
-      "answer_relevancy": 0.7073,
-      "context_precision": 1.0,
-      "context_recall": 0.9
+      "faithfulness": 0.9433,
+      "answer_relevancy": 0.7794,
+      "context_precision": 0.9,
+      "context_recall": 0.8167
     },
     "ENTITY": {
-      "faithfulness": 0.9,
-      "answer_relevancy": 0.136,
-      "context_precision": 0.4,
-      "context_recall": 0.72
+      "faithfulness": 0.9375,
+      "answer_relevancy": 0.8356,
+      "context_precision": 0.75,
+      "context_recall": 0.7708
     },
     "MULTIHOP": {
-      "faithfulness": 0.9,
-      "answer_relevancy": 0.5446,
-      "context_precision": 1.0,
-      "context_recall": 0.96
+      "faithfulness": 0.75,
+      "answer_relevancy": 0.3864,
+      "context_precision": 0.75,
+      "context_recall": 0.375
     }
   },
   "quality_gates": {
     "faithfulness": {
-      "score": 0.9386,
+      "score": 0.9092,
       "threshold": 0.75,
       "passed": true
     },
     "answer_relevancy": {
-      "score": 0.4626,
+      "score": 0.7045,
       "threshold": 0.75,
       "passed": false
     },
     "context_precision": {
-      "score": 0.8,
+      "score": 0.85,
       "threshold": 0.65,
       "passed": true
     },
     "context_recall": {
-      "score": 0.87,
+      "score": 0.7375,
       "threshold": 0.55,
       "passed": true
     }

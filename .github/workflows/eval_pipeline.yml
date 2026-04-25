@@ -91,4 +91,5 @@ jobs:
           path: |
             evaluation/v2/evaluation_results_v2.csv
             evaluation/v2/summary.json
+            evaluation/v2/test_dataset.json
           if-no-files-found: warn
