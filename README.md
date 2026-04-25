@@ -260,9 +260,6 @@ mlops-rag-pipeline/
 | [2602.02276v1.pdf](https://arxiv.org/abs/2602.02276) | Kimi K2.5 / Multimodal agents | ~20 |
 
 
-## Sources for data:
-
-
 ## Known Limitations
 
 - **Table detection**: pdfplumber detects ruling-line tables only. LaTeX booktabs-style tables in academic papers are captured as body text. Fix: camelot-py lattice/stream detection or a vision model pass for image-rendered tables.
