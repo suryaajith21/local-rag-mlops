@@ -77,7 +77,7 @@ MULTIHOP, ADVERSARIAL) using Mistral-7B as independent judge.
 
 Answer relevancy is suppressed by the ADVERSARIAL category where
 correct refusals ("The document does not contain sufficient information")
-score 0.0 under Ragas' metric design. Non-adversarial score is 0.70.
+score 0.0 under Ragas' metric design. The system is behaving correctly.
 
 V1 faithfulness and answer_relevancy were measured with llama3.2
 grading its own outputs, introducing self-consistency bias. V2 uses
