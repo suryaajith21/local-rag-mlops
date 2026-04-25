@@ -20,37 +20,20 @@ jobs:
 
       - name: Run ingestion pipeline (all PDFs in data/)
         run: |
-          conda run -n rag-ops python -c "
-          import asyncio
-          from src.ingestion.pipeline import run_ingestion_pipeline
-          summary = asyncio.run(run_ingestion_pipeline(clear_existing=True))
-          print('Ingestion summary:')
-          for k, v in summary.items():
-              print(f'  {k}: {v}')
-          files = summary.get('files_processed', 0)
-          assert files > 0, f'No files ingested - check data/ directory'
-          "
+          conda run -n rag-ops python scripts/ci_ingest.py
 
       - name: Start FastAPI server
         run: |
-          start /B conda run -n rag-ops uvicorn src.api.server:app --host 0.0.0.0 --port 8000
+          start /B cmd /c conda run -n rag-ops uvicorn src.api.server:app --host 0.0.0.0 --port 8000
           timeout /T 20 /NOBREAK
 
       - name: Verify server health
         run: |
-          conda run -n rag-ops python -c "
-          import httpx, json
-          r = httpx.get('http://localhost:8000/health')
-          r.raise_for_status()
-          data = r.json()
-          print('Health:', json.dumps(data, indent=2))
-          assert data['status'] == 'ok', 'Server unhealthy'
-          assert data['vector_chunks'] > 0, 'Vector store is empty after ingestion'
-          "
+          conda run -n rag-ops python scripts/ci_health_check.py
 
       - name: Run evaluation (eval_v2.py)
         run: |
-          conda run -n rag-ops python evaluation/eval_v2.py --server http://localhost:8000
+          conda run -n rag-ops python evaluation/eval_v2.py
 
       - name: Stop FastAPI server
         if: always()
