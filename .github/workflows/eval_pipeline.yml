@@ -15,23 +15,28 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install / sync dependencies
+        working-directory: ${{ github.workspace }}
         run: |
           conda run -n rag-ops python -m pip install -r requirements.txt -q
 
       - name: Run ingestion pipeline (all PDFs in data/)
+        working-directory: ${{ github.workspace }}
         run: |
           conda run -n rag-ops python scripts/ci_ingest.py
 
       - name: Start FastAPI server
+        working-directory: ${{ github.workspace }}
         run: |
           start /B cmd /c conda run -n rag-ops uvicorn src.api.server:app --host 0.0.0.0 --port 8000
           timeout /T 20 /NOBREAK
 
       - name: Verify server health
+        working-directory: ${{ github.workspace }}
         run: |
           conda run -n rag-ops python scripts/ci_health_check.py
 
       - name: Run evaluation (eval_v2.py)
+        working-directory: ${{ github.workspace }}
         run: |
           conda run -n rag-ops python evaluation/eval_v2.py
 

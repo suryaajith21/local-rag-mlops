@@ -1,4 +1,7 @@
-import httpx, sys
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import httpx
 
 try:
     r = httpx.get('http://localhost:8000/health', timeout=5.0)
