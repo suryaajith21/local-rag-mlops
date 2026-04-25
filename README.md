@@ -68,12 +68,12 @@ PDF Documents
 Evaluated on 20 questions across 4 categories (DIRECT, ENTITY,
 MULTIHOP, ADVERSARIAL) using Mistral-7B as independent judge.
 
-| Metric | Score | Non-adversarial | Gate | Status |
-|---|---|---|---|---|
-| Faithfulness | 0.9092 | — | >= 0.75 | **PASS** |
-| Answer Relevancy | 0.6341 | 0.7045* | >= 0.75 | **FAIL*** |
-| Context Precision | 0.8500 | — | >= 0.65 | **PASS** |
-| Context Recall | 0.7375 | — | >= 0.55 | **PASS** |
+| Metric | V1 (self-graded) | V2 Score (all 20) | V2 Non-adversarial | Gate | Status |
+|---|---|---|---|---|---|
+| Faithfulness | 0.89 | 0.9092 | — | >= 0.75 | **PASS** |
+| Answer Relevancy | 0.86 | 0.6341 | 0.7045* | >= 0.75 | **FAIL*** |
+| Context Precision | — | 0.8500 | — | >= 0.65 | **PASS** |
+| Context Recall | — | 0.7375 | — | >= 0.55 | **PASS** |
 
 *Answer relevancy is suppressed by the ADVERSARIAL category where
 correct refusals ("The document does not contain sufficient information")
