@@ -70,14 +70,14 @@ MULTIHOP, ADVERSARIAL) using Mistral-7B as independent judge.
 
 | Metric | Score | Non-adversarial | Gate | Status |
 |---|---|---|---|---|
-| Faithfulness | 0.9092 | — | >= 0.75 | PASS |
-| Answer Relevancy | 0.6341 | 0.7045 | >= 0.75 | FAIL* |
-| Context Precision | 0.8500 | — | >= 0.65 | PASS |
-| Context Recall | 0.7375 | — | >= 0.55 | PASS |
+| Faithfulness | 0.9092 | — | >= 0.75 | **PASS** |
+| Answer Relevancy | 0.6341 | 0.7045 | >= 0.75 | **FAIL*** |
+| Context Precision | 0.8500 | — | >= 0.65 | **PASS** |
+| Context Recall | 0.7375 | — | >= 0.55 | **PASS** |
 
 Answer relevancy is suppressed by the ADVERSARIAL category where
 correct refusals ("The document does not contain sufficient information")
-score 0.0 under Ragas' metric design. The system is behaving correctly.
+score 0.0 under Ragas' metric design. **Non-adversarial score is 0.70.**
 
 V1 faithfulness and answer_relevancy were measured with llama3.2
 grading its own outputs, introducing self-consistency bias. V2 uses
@@ -91,7 +91,7 @@ an independent Mistral-7B judge for all metrics.
 | ADVERSARIAL | 2 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
 
 MULTIHOP weakness is a known architectural constraint: questions requiring
-simultaneous retrieval from two documents compete for k_final=5 slots,
+simultaneous retrieval from two documents compete for **k_final=5** slots,
 limiting cross-document coverage after reranking.
 
 
