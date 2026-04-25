@@ -10,21 +10,17 @@ jobs:
   evaluate-rag:
     runs-on: self-hosted
 
-    env:
-      CONDA_ENV: rag-ops
-      SERVER_URL: http://localhost:8000
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install / sync dependencies
         run: |
-          conda run -n %CONDA_ENV% python -m pip install -r requirements.txt -q
+          conda run -n rag-ops python -m pip install -r requirements.txt -q
 
       - name: Run ingestion pipeline (all PDFs in data/)
         run: |
-          conda run -n %CONDA_ENV% python -c "
+          conda run -n rag-ops python -c "
           import asyncio
           from src.ingestion.pipeline import run_ingestion_pipeline
           summary = asyncio.run(run_ingestion_pipeline(clear_existing=True))
@@ -37,12 +33,12 @@ jobs:
 
       - name: Start FastAPI server
         run: |
-          start /B conda run -n %CONDA_ENV% uvicorn src.api.server:app --host 0.0.0.0 --port 8000
+          start /B conda run -n rag-ops uvicorn src.api.server:app --host 0.0.0.0 --port 8000
           timeout /T 20 /NOBREAK
 
       - name: Verify server health
         run: |
-          conda run -n %CONDA_ENV% python -c "
+          conda run -n rag-ops python -c "
           import httpx, json
           r = httpx.get('http://localhost:8000/health')
           r.raise_for_status()
@@ -54,7 +50,7 @@ jobs:
 
       - name: Run evaluation (eval_v2.py)
         run: |
-          conda run -n %CONDA_ENV% python evaluation/eval_v2.py --server %SERVER_URL%
+          conda run -n rag-ops python evaluation/eval_v2.py --server http://localhost:8000
 
       - name: Stop FastAPI server
         if: always()
