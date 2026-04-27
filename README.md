@@ -3,7 +3,6 @@
 A self-hosted, privacy-first Retrieval-Augmented Generation system
 built as an upgrade over the original RAG pipeline. All inference runs
 locally.
-locally.
 
 ## Architecture
 
